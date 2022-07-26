@@ -37,8 +37,7 @@
       </v-row>
       <v-container fluid class="transactions px-0">
         <!--  TODO: create a pegin-tx-summary component-->
-        <!--
-        <tx-pegin-status
+        <tx-pegin
           v-if="!isRejected && showStatus && isPegIn"
           :statusFee="currentFee"
           :statusRefundAddress="currentRefundAddress"
@@ -46,17 +45,18 @@
           :showTxId="true"
           :initialExpand="true"
           :isRejected="isRejected"
-          :pegInStatus="pegInStatus'
+          :pegInStatus='pegInStatus'
           />
-        -->
+
         Rejected {{ isRejected }}
         show status {{ showStatus }}
-        <!--  TODO: create a pegout-tx-summary component-->
+
+         <!--  TODO: create a pegout-tx-summary component-->
         <tx-pegout
           v-if="!isRejected && showStatus && isPegOut"
+          :txId ="txId"
           :pegStatus="pegOutStatus"
         />
-
         <v-row justify="center" class="mx-0 mt-5">
           <v-col cols="2" class="d-flex justify-start ma-0 pa-0">
             <v-btn rounded outlined color="#00B520" width="110" @click="back">
@@ -81,6 +81,7 @@ import {
 } from 'vue-property-decorator';
 import { State, Action } from 'vuex-class';
 import TxPegout from '@/components/status/TxPegout.vue';
+import TxPegin from '@/components/status/TxPegin.vue';
 import { ApiService } from '@/services';
 import {
   PeginStatus, TxData, PegInTxState, SatoshiBig, TxStatus, TxStatusType, PegoutStatusDataModel,
@@ -91,6 +92,7 @@ import * as constants from '@/store/constants';
 @Component({
   components: {
     TxPegout,
+    TxPegin,
   },
 })
 export default class Status extends Vue {
@@ -128,8 +130,6 @@ export default class Status extends Vue {
 
   leftBtcTime = '';
 
-  btcConfirmationsRequired!: number;
-
   currentFee = new SatoshiBig('0', 'btc');
 
   currentRefundAddress = '';
@@ -149,7 +149,7 @@ export default class Status extends Vue {
   @Action(constants.PEGIN_TX_ADD_BITCOIN_PRICE, { namespace: 'pegInTx' }) getBtcPrice !: () => Promise<void>;
 
   get showStatus() {
-    return !this.loading && !this.error && !this.statusMessage;
+    return !this.loading && !this.error && !!this.statusMessage;
   }
 
   @Emit()
