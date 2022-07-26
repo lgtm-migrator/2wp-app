@@ -47,10 +47,8 @@
           :isRejected="isRejected"
           :pegInStatus='pegInStatus'
           />
-
         Rejected {{ isRejected }}
         show status {{ showStatus }}
-
          <!--  TODO: create a pegout-tx-summary component-->
         <tx-pegout
           v-if="!isRejected && showStatus && isPegOut"
