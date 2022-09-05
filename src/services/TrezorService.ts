@@ -35,6 +35,11 @@ export default class TrezorService extends WalletService {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  enable(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   public getWalletAddressesPerCall(): number {
     return EnvironmentAccessorService.getEnvironmentVariables().vueAppWalletAddressesPerCallTrezor;
   }

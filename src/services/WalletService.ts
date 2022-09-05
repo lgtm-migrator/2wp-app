@@ -27,6 +27,8 @@ export default abstract class WalletService {
 
   abstract sign(tx: Tx): Promise<SignedTx>;
 
+  abstract enable(): Promise<void>;
+
   public isLoadingBalances2(): boolean {
     return this.loadingBalances;
   }

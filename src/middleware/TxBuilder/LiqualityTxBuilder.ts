@@ -10,6 +10,7 @@ import { ApiService } from '@/services';
 
 export default class LiqualityTxBuilder extends TxBuilder {
   buildTx(normalizedTx: NormalizedTx): Promise<LiqualityTx> {
+    console.log('Building TXXXXXXXXXXXXXXXXXXXX');
     return new Promise<LiqualityTx>((resolve, reject) => {
       const psbt = new bitcoin.Psbt({ network: this.network });
       LiqualityTxBuilder.getExtendedInputs(normalizedTx.inputs)
@@ -50,6 +51,7 @@ export default class LiqualityTxBuilder extends TxBuilder {
 
   private static getExtendedInputs(normalizedInputs: Array<NormalizedInput>)
     :Promise<Array<PsbtExtendedInput>> {
+    console.log('getExtendedInputsssssssssssssssssssssss');
     return new Promise<Array<PsbtExtendedInput>>((resolve, reject) => {
       const psbtExtendedInputs: Array<PsbtExtendedInput> = [];
       const hexUtxoPromises = normalizedInputs

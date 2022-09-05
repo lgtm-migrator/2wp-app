@@ -1,144 +1,154 @@
 <template>
-  <div class="transactions">
-    <v-row class="mx-0 d-flex justify-center">
-      <v-col cols="10" lg="8" xl="6" class="d-flex justify-center">
-        <h1 class="text-center">Confirm transaction details</h1>
-      </v-col>
-    </v-row>
-    <v-row class="mx-0 my-8 d-flex justify-center">
-      <p class="text-center">
-        Make sure the amount, address and transaction fee displayed
-        on the Liquality wallet are correct.
-        <br>
-        To prevent malware attacks, double-check the address with the recipient.
-        <br>
-        Press <strong>sign</strong> when you finish.
-      </p>
-    </v-row>
-    <v-row id="instructions-trezor" justify="center" class="mx-0">
-      <v-col cols="4">
-      </v-col>
-      <v-col cols="4">
-        <v-row class="mx-0 d-flex justify-center">
-          <h4 class="text-center">
-            Transaction information
-          </h4>
-        </v-row>
-      </v-col>
-      <v-col cols="4">
-      </v-col>
-    </v-row>
-    <v-row justify="center" class="mx-0">
-       <v-col cols="4">
-      </v-col>
-      <v-col cols="4">
-        <fieldset class="confirmation-box">
-          <legend align="center" class="px-4">See on liquality</legend>
-          <v-row justify="left" class="mt-5 mx-5 line-box-bottom">
-            <v-col cols="3" class="d-flex flex-column align-left">
-              <h3>
-                {{
-                this.pegInTxState.normalizedTx.outputs[0].amount
-                + ' ' +
-                environmentContext.getBtcTicker()
-                }}
-              </h3>
-            </v-col>
-            <v-col cols="9" class="d-flex flex-column align-left">
-              <v-tooltip right>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-icon
-                    small
-                    class="icon-left"
-                    color="teal darken-2"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    mdi-information
-                  </v-icon>
-                </template>
-                <p class="tooltip-form mb-0">
-                 This output only contains metadata required by
-                 RSK to process the peg-in, therefore it doesn't
-                 include any value.
-                </p>
-              </v-tooltip>
-            </v-col>
+  <v-container fluid class="px-md-0">
+    <template v-if="showErrorDialog">
+      <device-error-dialog :showErrorDialog="showErrorDialog"
+                            :errorMessage="deviceError"
+                            :errorType="errorType"
+                            :urlToMoreInformation="urlToMoreInformation"
+                            :messageToUserOnLink="messageToUserOnLink"
+                            @closeErrorDialog="closeErrorDialog"/>
+    </template>
+    <div class="transactions">
+      <v-row class="mx-0 d-flex justify-center">
+        <v-col cols="10" lg="8" xl="6" class="d-flex justify-center">
+          <h1 class="text-center">Confirm transaction details</h1>
+        </v-col>
+      </v-row>
+      <v-row class="mx-0 my-8 d-flex justify-center">
+        <p class="text-center">
+          Make sure the amount, address and transaction fee displayed
+          on the Liquality wallet are correct.
+          <br>
+          To prevent malware attacks, double-check the address with the recipient.
+          <br>
+          Press <strong>sign</strong> when you finish.
+        </p>
+      </v-row>
+      <v-row id="instructions-trezor" justify="center" class="mx-0">
+        <v-col cols="4">
+        </v-col>
+        <v-col cols="4">
+          <v-row class="mx-0 d-flex justify-center">
+            <h4 class="text-center">
+              Transaction information
+            </h4>
           </v-row>
+        </v-col>
+        <v-col cols="4">
+        </v-col>
+      </v-row>
+      <v-row justify="center" class="mx-0">
+        <v-col cols="4">
+        </v-col>
+        <v-col cols="4">
+          <fieldset class="confirmation-box">
+            <legend align="center" class="px-4">See on liquality</legend>
+            <v-row justify="center" class="mt-5 mx-5 line-box-bottom">
+              <v-col cols="3" class="d-flex flex-column align-left">
+                <h3>
+                  {{
+                  this.pegInTxState.normalizedTx.outputs[0].amount
+                  + ' ' +
+                  environmentContext.getBtcTicker()
+                  }}
+                </h3>
+              </v-col>
+              <v-col cols="9" class="d-flex flex-column align-left">
+                <v-tooltip right>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                      small
+                      class="icon-left"
+                      color="teal darken-2"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      mdi-information
+                    </v-icon>
+                  </template>
+                  <p class="tooltip-form mb-0">
+                  This output only contains metadata required by
+                  RSK to process the peg-in, therefore it doesn't
+                  include any value.
+                  </p>
+                </v-tooltip>
+              </v-col>
+            </v-row>
 
-           <v-row justify="left" class="mx-4 line-box-bottom">
-            <v-col class="pa-0 pb-2 d-flex flex-column align-left">
-              <span class="breakable-address my-5">
-                {{ this.pegInTxState.normalizedTx.outputs[1].address }}
-              </span>
-              <h3>
-                {{ this.pegInTxState.normalizedTx.outputs[1].amount +
-                ' '
-                + environmentContext.getBtcTicker()
-                }}
-              </h3>
-            </v-col>
-          </v-row>
+            <v-row justify="center" class="mx-4 line-box-bottom">
+              <v-col class="pa-0 pb-2 d-flex flex-column align-left">
+                <span class="breakable-address my-5">
+                  {{ this.pegInTxState.normalizedTx.outputs[1].address }}
+                </span>
+                <h3>
+                  {{ this.pegInTxState.normalizedTx.outputs[1].amount +
+                  ' '
+                  + environmentContext.getBtcTicker()
+                  }}
+                </h3>
+              </v-col>
+            </v-row>
 
-          <v-row v-if="this.pegInTxState.normalizedTx.outputs[2]"
-          justify="left" class="mx-4 line-box-bottom">
-            <v-col class="pa-0 pb-2 d-flex flex-column align-left">
-              <span class="breakable-address my-5">
-                {{ this.pegInTxState.normalizedTx.outputs[2].address }}
-              </span>
-              <h3>
-                {{ this.pegInTxState.normalizedTx.outputs[2].amount +
-                ' '
-                + environmentContext.getBtcTicker()
-                }}
-              </h3>
-            </v-col>
-          </v-row>
+            <v-row v-if="this.pegInTxState.normalizedTx.outputs[2]"
+            justify="center" class="mx-4 line-box-bottom">
+              <v-col class="pa-0 pb-2 d-flex flex-column align-left">
+                <span class="breakable-address my-5">
+                  {{ this.pegInTxState.normalizedTx.outputs[2].address }}
+                </span>
+                <h3>
+                  {{ this.pegInTxState.normalizedTx.outputs[2].amount +
+                  ' '
+                  + environmentContext.getBtcTicker()
+                  }}
+                </h3>
+              </v-col>
+            </v-row>
 
-          <v-row justify="left" class="mx-5 my-3">
-            <v-col class="pa-0 pb-2 d-flex flex-column align-left">
-              <span class="grayish">
-                Fee: {{ fee + ' ' + environmentContext.getBtcTicker() }}
-              </span>
-            </v-col>
+            <v-row justify="center" class="mx-5 my-3">
+              <v-col class="pa-0 pb-2 d-flex flex-column align-left">
+                <span class="grayish">
+                  Fee: {{ fee + ' ' + environmentContext.getBtcTicker() }}
+                </span>
+              </v-col>
+            </v-row>
+          </fieldset>
+        </v-col>
+        <v-col cols="4">
+        </v-col>
+      </v-row>
+      <v-divider/>
+      <v-row class="mx-0 my-8">
+        <tx-summary :showTxId="false" :initial-expand="true"/>
+      </v-row>
+      <v-row class="mx-0 my-8">
+        <advanced-data :rawTx="rawTx" :initial-expand="false"/>
+      </v-row>
+      <v-row v-if="confirmTxState.matches(['idle', 'error', 'goingHome'])" class="ma-0">
+        <v-col cols="2" class="d-flex justify-start ma-0 py-0">
+          <v-btn rounded outlined color="#00B520" width="110" @click="toPegInForm"
+                :disabled="confirmTxState.matches(['error', 'goingHome', 'loading'])">
+            <span>Back</span>
+          </v-btn>
+        </v-col>
+        <v-col cols="10" class="d-flex justify-end ma-0 py-0">
+          <v-btn rounded color="#00B520" width="110" @click="toTrackId"
+                :disabled="confirmTxState.matches(['error', 'goingHome', 'loading'])">
+            <span class="whiteish">Sign</span>
+          </v-btn>
+        </v-col>
+      </v-row>
+      <v-row v-if="confirmTxState.matches(['loading'])" class="mx-0 d-flex justify-center">
+        <v-col>
+          <v-row class="mx-0 mb-5 d-flex justify-center">
+            See Liquality wallet to confirm your transaction!
           </v-row>
-        </fieldset>
-      </v-col>
-      <v-col cols="4">
-      </v-col>
-    </v-row>
-    <v-divider/>
-    <v-row class="mx-0 my-8">
-      <tx-summary :showTxId="false" :initial-expand="true"/>
-    </v-row>
-    <v-row class="mx-0 my-8">
-      <advanced-data :rawTx="rawTx" :initial-expand="false"/>
-    </v-row>
-    <v-row v-if="confirmTxState.matches(['idle', 'error', 'goingHome'])" class="ma-0">
-      <v-col cols="2" class="d-flex justify-start ma-0 py-0">
-        <v-btn rounded outlined color="#00B520" width="110" @click="toPegInForm"
-               :disabled="confirmTxState.matches(['error', 'goingHome', 'loading'])">
-          <span>Back</span>
-        </v-btn>
-      </v-col>
-      <v-col cols="10" class="d-flex justify-end ma-0 py-0">
-        <v-btn rounded color="#00B520" width="110" @click="toTrackId"
-               :disabled="confirmTxState.matches(['error', 'goingHome', 'loading'])">
-          <span class="whiteish">Sign</span>
-        </v-btn>
-      </v-col>
-    </v-row>
-    <v-row v-if="confirmTxState.matches(['loading'])" class="mx-0 d-flex justify-center">
-      <v-col>
-        <v-row class="mx-0 mb-5 d-flex justify-center">
-          See Liquality wallet to confirm your transaction!
-        </v-row>
-        <v-row class="mx-0 mb-5 mt-10 d-flex justify-center">
-          <v-progress-circular indeterminate :size="60" :width="8" color="#00B520" />
-        </v-row>
-      </v-col>
-    </v-row>
-  </div>
+          <v-row class="mx-0 mb-5 mt-10 d-flex justify-center">
+            <v-progress-circular indeterminate :size="60" :width="8" color="#00B520" />
+          </v-row>
+        </v-col>
+      </v-row>
+    </div>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -150,6 +160,7 @@ import { Getter, State, Action } from 'vuex-class';
 import {
   LiqualitySignedTx,
   LiqualityTx,
+  LiqualityError,
 } from '@/types';
 import TxSummary from '@/components/exchange/TxSummary.vue';
 import ApiService from '@/services/ApiService';
@@ -161,17 +172,35 @@ import EnvironmentContextProviderService from '@/providers/EnvironmentContextPro
 import { PegInTxState } from '@/types/pegInTx';
 import * as constants from '@/store/constants';
 import LiqualityTxBuilder from '@/middleware/TxBuilder/LiqualityTxBuilder';
+import DeviceErrorDialog from '@/components/exchange/DeviceErrorDialog.vue';
 
 @Component({
   components: {
     TxSummary,
     AdvancedData,
+    DeviceErrorDialog,
   },
 })
 export default class ConfirmLiqualityTransaction extends Vue {
   txId = '';
 
   rawTx = '';
+
+  showErrorDialog = false;
+
+  showTxErrorDialog = false;
+
+  deviceError = 'test';
+
+  errorType = '';
+
+  urlToMoreInformation = '';
+
+  messageToUserOnLink = '';
+
+  currentComponent = 'PegInForm';
+
+  txError = '';
 
   @Prop() confirmTxState!: Machine<
     'idle'
@@ -196,20 +225,33 @@ export default class ConfirmLiqualityTransaction extends Vue {
 
   @Emit('successConfirmation')
   async toTrackId() {
+    console.log('toTrackId');
     let txError = '';
     this.confirmTxState.send('loading');
-    await this.walletService.stopAskingForBalance()
-      .then(() => this.txBuilder.buildTx(this.pegInTxState.normalizedTx))
-      .then((tx: LiqualityTx) => this.walletService.sign(tx) as Promise<LiqualitySignedTx>)
-      .then((liqualitySignedTx: LiqualitySignedTx) => ApiService
-        .broadcast(liqualitySignedTx.signedTx))
-      .then((txId) => {
-        this.txId = txId;
-      })
-      .catch((err) => {
-        this.confirmTxState.send('error');
-        txError = err.message;
-      });
+    console.log('loading');
+    try {
+      await this.walletService.enable();
+
+      await this.walletService.stopAskingForBalance()
+        .then(() => this.txBuilder.buildTx(this.pegInTxState.normalizedTx))
+        .then((tx: LiqualityTx) => this.walletService.sign(tx) as Promise<LiqualitySignedTx>)
+        .then((liqualitySignedTx: LiqualitySignedTx) => ApiService
+          .broadcast(liqualitySignedTx.signedTx))
+        .then((txId) => {
+          this.txId = txId;
+        });
+    } catch (e) {
+      console.log('Ocorreu um erro');
+      this.confirmTxState.send('error');
+      txError = e.message;
+
+      if (e instanceof LiqualityError) {
+        this.errorType = e.errorType;
+        this.urlToMoreInformation = e.urlToMoreInformation;
+        this.messageToUserOnLink = e.messageToUserOnLink;
+      }
+      this.showErrorDialog = true;
+    }
     return [txError, this.txId];
   }
 
@@ -276,6 +318,22 @@ export default class ConfirmLiqualityTransaction extends Vue {
 
   async created() {
     this.rawTx = await this.txBuilder.getUnsignedRawTx(this.pegInTxState.normalizedTx);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  beforeMount() {
+    console.log('associando o onerror...');
+    window.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
+      console.log(`Ocorreu um erro ${errorMsg}`);
+      return false;
+    };
+    window.addEventListener('error', (e) => {
+      console.log(`Ocorreu um erro: ${e.error.message}`);
+      return false;
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      console.log(`Ocorreu um erro: ${e.reason.message}`);
+    });
   }
 }
 </script>

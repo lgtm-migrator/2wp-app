@@ -20,7 +20,7 @@ export default class LiqualityService extends WalletService {
     }
   }
 
-  private enable(): Promise<void> {
+  enable(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       try {
         this.bitcoinProvider = window.bitcoin;
@@ -78,25 +78,38 @@ export default class LiqualityService extends WalletService {
 
   sign(tx: LiqualityTx): Promise<LiqualitySignedTx> {
     const liqualityTx = tx as LiqualityTx;
+    console.log('trying to signnnnnnnnnnn');
     return new Promise<LiqualitySignedTx>((resolve, reject) => {
-      this.bitcoinProvider.request({
-        method: LiqualityMethods.SIGN_PSBT,
-        params: [
-          liqualityTx.base64UnsignedPsbt,
-          liqualityTx.inputs,
-        ],
-      })
-        .then((signedBase64Psbt) => {
-          const signedPsbt = bitcoin.Psbt.fromBase64(signedBase64Psbt as string);
-          if (!signedPsbt.validateSignaturesOfAllInputs()) {
-            reject(new Error('Invalid signature provided'));
-          } else {
-            resolve({
-              signedTx: signedPsbt.finalizeAllInputs().extractTransaction().toHex(),
-            });
-          }
+      try {
+        console.log('verify 0');
+
+        this.bitcoinProvider.request({
+          method: LiqualityMethods.SIGN_PSBT,
+          params: [
+            liqualityTx.base64UnsignedPsbt,
+            liqualityTx.inputs,
+          ],
         })
-        .catch(reject);
+          .then((signedBase64Psbt) => {
+            console.log('verify 2');
+            const signedPsbt = bitcoin.Psbt.fromBase64(signedBase64Psbt as string);
+            console.log('verify 3');
+            if (!signedPsbt.validateSignaturesOfAllInputs()) {
+              console.log('verify 4');
+              reject(new Error('Invalid signature provided'));
+            } else {
+              console.log('verify 5');
+              resolve({
+                signedTx: signedPsbt.finalizeAllInputs().extractTransaction().toHex(),
+              });
+            }
+          }).catch((error) => {
+            console.log(`Ocorreu um erro ${error}`);
+          });
+      } catch (e) {
+        console.log('Error captured throwing LiqualityError');
+        reject(new LiqualityError());
+      }
     });
   }
 }
