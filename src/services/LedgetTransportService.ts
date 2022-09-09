@@ -30,7 +30,12 @@ export default class LedgerTransportService {
     return LedgerTransportService.instance;
   }
 
+  public static refreshConnection() {
+    LedgerTransportService.instance = new LedgerTransportService();
+  }
+
   getTransport(): Promise<TransportWebUSB> {
+    console.log('getTransport');
     return new Promise<TransportWebUSB>((resolve, reject) => {
       if (this.transportRequestList.length === 0 && !this.isTransportBusy) {
         this.transportRequestList.push({ resolve, reject });
@@ -42,6 +47,7 @@ export default class LedgerTransportService {
   }
 
   public enqueueRequest<Type>(request: GenericLedgerRequestFn<Type>): Promise<Type> {
+    console.log('enqueueRequest');
     return new Promise<Type>((resolve, reject) => {
       this.getTransport()
         .then((transport :TransportWebUSB) => request(transport))
@@ -56,7 +62,29 @@ export default class LedgerTransportService {
     this.processNext();
   }
 
+  public close():void {
+    this.isTransportBusy = false;
+    this.transportWebUsb.close()
+      .then(() => {
+        console.log('Closing...');
+      });
+  }
+
+  public isConnected():boolean {
+    this.isTransportBusy = false;
+    let isConnected = false;
+    try {
+      this.processNext();
+      isConnected = true;
+    } catch (e) {
+      console.log(`debittting ==> Error ${e}`);
+    }
+
+    return isConnected;
+  }
+
   private processNext(): void {
+    console.log('ProcessNext');
     if (this.transportRequestList.length === 0) return;
     this.isTransportBusy = true;
     const request = this.transportRequestList.shift();

@@ -196,9 +196,11 @@ export default class SendBitcoin extends Vue {
 
   @Emit()
   startAskingForBalance() {
+    console.log('Degubbing ===> startAskingForBalance');
     this.sendBitcoinState = 'loading';
     this.startAskingForBalanceStore()
       .catch((e) => {
+        console.log(`Degubbing ===> startAskingForBalance ${e}`);
         if (e.statusCode === 27010) {
           this.deviceError = 'Please unlock your Ledger device.';
         } else {

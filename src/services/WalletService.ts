@@ -27,6 +27,10 @@ export default abstract class WalletService {
 
   abstract sign(tx: Tx): Promise<SignedTx>;
 
+  abstract isConnected(): Promise<boolean>;
+
+  abstract reconnect(): Promise<void>;
+
   public isLoadingBalances2(): boolean {
     return this.loadingBalances;
   }
@@ -119,7 +123,17 @@ export default abstract class WalletService {
 
   // eslint-disable-next-line class-methods-use-this
   public async startAskingForBalance(sessionId: string, maxAmountPegin: number): Promise<void> {
+    console.log('Degutting ==> startAskingForBalance');
+
     // eslint-disable-next-line prefer-const
+    let connected = await this.isConnected();
+    console.log(`is connected ${connected}`);
+
+    if (!connected) {
+      console.log('Trying reconnect');
+      await this.reconnect();
+    }
+
     let balanceAccumulated: AccountBalance = {
       legacy: new SatoshiBig(0, 'satoshi'),
       segwit: new SatoshiBig(0, 'satoshi'),

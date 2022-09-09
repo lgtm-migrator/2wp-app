@@ -5,7 +5,7 @@ import * as bitcoin from 'bitcoinjs-lib';
 import * as constants from '@/store/constants';
 import { WalletAddress } from '@/types/pegInTx';
 import {
-  LedgerjsTransaction, LedgerSignedTx, LedgerTx, Tx,
+  LedgerjsTransaction, LedgerSignedTx, LedgerTx, LiqualityError, Tx,
 } from '@/types';
 import { EnvironmentAccessorService } from '@/services/enviroment-accessor.service';
 import { WalletService } from '@/services';
@@ -90,15 +90,51 @@ export default class LedgerService extends WalletService {
     return bundle;
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  public reconnect(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      try {
+        LedgerTransportService.refreshConnection();
+        resolve();
+      } catch (e) {
+        console.log(`deguttting ==> Error reconnecting ${e}`);
+        reject(e);
+      }
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/adjacent-overload-signatures
+  public isConnected(): Promise<boolean> {
+    return LedgerTransportService.getInstance()
+      .enqueueRequest(
+        // eslint-disable-next-line no-async-promise-executor
+        (transport: TransportWebUSB) => new Promise<boolean>(async (resolve, reject) => {
+          try {
+            console.log('Degubbing====== checkApp');
+            await this.checkApp(transport);
+            resolve(true);
+            console.log('Degubbing======  new AppBtc(transport);');
+          } catch (e) {
+            console.log(`Degutting ==> getAccountAddresses ${e}`);
+            resolve(false);
+          }
+        }),
+      );
+  }
+
   public getAccountAddresses(batch: number, index: number): Promise<WalletAddress[]> {
+    console.log('Degubbing====== getAccountAddresses');
     const bundle = this.getAddressesBundle(index, batch);
+    console.log('Degubbing====== getAddressesBundle');
     return LedgerTransportService.getInstance()
       .enqueueRequest(
         // eslint-disable-next-line no-async-promise-executor
         (transport: TransportWebUSB) => new Promise<WalletAddress[]>(async (resolve, reject) => {
           const walletAddresses: WalletAddress[] = [];
           try {
-            await LedgerService.checkApp(transport);
+            console.log('Degubbing====== checkApp');
+            await this.checkApp(transport);
+            console.log('Degubbing======  new AppBtc(transport);');
             const btc = new AppBtc(transport);
             // eslint-disable-next-line no-restricted-syntax
             for (const item of bundle) {
@@ -106,6 +142,7 @@ export default class LedgerService extends WalletService {
                 break;
               }
               const { derivationPath, format } = item;
+              console.log('Degubbing======  getWalletPublicKey;');
               // eslint-disable-next-line no-await-in-loop
               const walletPublicKey = await btc.getWalletPublicKey(derivationPath, { format });
               walletAddresses.push({
@@ -116,6 +153,7 @@ export default class LedgerService extends WalletService {
               });
             }
           } catch (e) {
+            console.log(`Degutting ==> getAccountAddresses ${e}`);
             reject(e);
           }
           resolve(walletAddresses);
@@ -164,7 +202,8 @@ export default class LedgerService extends WalletService {
       );
   }
 
-  public static getApp(transport: TransportWebUSB):
+  // eslint-disable-next-line class-methods-use-this
+  public getApp(transport: TransportWebUSB):
     Promise<{name: string; version: string; flags: Buffer}> {
     return new Promise<{name: string; version: string; flags: Buffer}>((resolve, reject) => {
       transport.send(0xb0, 0x01, 0x00, 0x00)
@@ -185,9 +224,10 @@ export default class LedgerService extends WalletService {
     });
   }
 
-  private static async checkApp(transport: TransportWebUSB): Promise<void> {
+  private async checkApp(transport: TransportWebUSB): Promise<void> {
+    console.log('Degugging ==> checkApp');
     return new Promise<void>((resolve, reject) => {
-      LedgerService.getApp(transport)
+      this.getApp(transport)
         .then(({ name }) => {
           const network = EnvironmentAccessorService.getEnvironmentVariables().vueAppCoin;
           let valid: boolean;
