@@ -93,7 +93,15 @@ export default abstract class WalletService {
     this.subscribers = [];
   }
 
-  public stopAskingForBalance(): Promise<void> {
+  public async stopAskingForBalance(): Promise<void> {
+    console.log('Verifyind if is connected');
+    const connected = await this.isConnected();
+    console.log('Verifyind if is connected');
+    console.log(connected);
+    if (!connected) {
+      await this.reconnect();
+    }
+
     let counter = 60;
     const period = 500;
     return new Promise<void>((resolve, reject) => {
@@ -133,22 +141,27 @@ export default abstract class WalletService {
     const maxAddressPerCall: number = this.getWalletAddressesPerCall();
     let addresses: WalletAddress[] = [];
     try {
+      console.log('startAskingForBalance calling isconnected');
       const connected = await this.isConnected();
-
+      console.log(connected);
       if (!connected) {
+        console.log('startAskingForBalance trying to reconnect');
         await this.reconnect();
       }
+      console.log('startAskingForBalance after reconnect');
 
       for (
         let startFrom = 0;
         startFrom < (this.getWalletMaxCall() * maxAddressPerCall) && this.subscribers.length !== 0;
         startFrom += maxAddressPerCall
       ) {
+        console.log('startAskingForBalance getAccountAddresses');
         // eslint-disable-next-line no-await-in-loop
         addresses = await this.getAccountAddresses(maxAddressPerCall, startFrom);
         if (addresses.length === 0) {
           throw new Error('Error getting list of addresses - List of addresses is empty');
         }
+        console.log('startAskingForBalance getAccountAddresses finishing');
         // eslint-disable-next-line no-await-in-loop
         addresses = await WalletService.getUnusedValue(addresses);
         // eslint-disable-next-line no-await-in-loop

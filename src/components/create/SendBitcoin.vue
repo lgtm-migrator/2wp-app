@@ -196,9 +196,12 @@ export default class SendBitcoin extends Vue {
 
   @Emit()
   startAskingForBalance() {
+    this.attachErrorListener();
     this.sendBitcoinState = 'loading';
     this.startAskingForBalanceStore()
       .catch((e) => {
+        console.log('SendBitcoin error');
+        console.log(`SendBitcoin error ${e}`);
         if (e.statusCode === 27010) {
           this.deviceError = 'Please unlock your Ledger device.';
         } else {
@@ -227,6 +230,25 @@ export default class SendBitcoin extends Vue {
     this.clearStore();
     this.init()
       .then(() => this.setBtcWallet(wallet));
+  }
+
+  private attachErrorListener() {
+    window.addEventListener('unhandledrejection', (event) => {
+      if (event.reason) {
+        console.log(`Error ocurred unhandledrejection ${event}`);
+        this.errorOnConnection();
+      }
+    });
+  }
+
+  errorOnConnection() {
+    this.sendBitcoinState = 'error';
+    const error = new LiqualityError();
+    this.errorType = error.errorType;
+    this.urlToMoreInformation = error.urlToMoreInformation;
+    this.messageToUserOnLink = error.messageToUserOnLink;
+    this.sendBitcoinState = 'error';
+    this.showErrorDialog = true;
   }
 
   @Emit('back')
