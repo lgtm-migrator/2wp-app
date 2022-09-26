@@ -35,7 +35,7 @@
         <fieldset class="confirmation-box">
           <legend align="center" class="px-4">See on liquality</legend>
           <v-row justify="left" class="mt-5 mx-3 line-box-bottom">
-            <v-col cols="3" class="d-flex flex-column align-left px-0">
+            <v-col cols="2" class="d-flex flex-column align-left px-0">
               <h3>
                 {{
                 this.pegInTxState.normalizedTx.outputs[0].amount
@@ -44,7 +44,7 @@
                 }}
               </h3>
             </v-col>
-            <v-col cols="1" class="d-flex flex-column align-left">
+            <v-col cols="10" class="d-flex flex-column align-left pl-0">
               <v-tooltip right>
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon
@@ -72,9 +72,8 @@
                 {{ this.pegInTxState.normalizedTx.outputs[1].address }}
               </span>
               <h3>
-                {{ this.pegInTxState.normalizedTx.outputs[1].amount +
-                ' '
-                + environmentContext.getBtcTicker()
+                {{
+                  converAmount(this.pegInTxState.normalizedTx.outputs[1].amount)
                 }}
               </h3>
             </v-col>
@@ -89,9 +88,8 @@
               <div class="d-flex">
                 <div class="liquality-info-container">
                   <h3>
-                    {{ this.pegInTxState.normalizedTx.outputs[2].amount +
-                    ' '
-                    + environmentContext.getBtcTicker()
+                    {{
+                      converAmount(this.pegInTxState.normalizedTx.outputs[2].amount)
                     }}
                   </h3>
                 </div>
@@ -250,6 +248,11 @@ export default class ConfirmLiqualityTransaction extends Vue {
   // eslint-disable-next-line class-methods-use-this
   splitString(s: string): string[] {
     return s.match(/.{1,16}/g) ?? [];
+  }
+
+  converAmount(amount: string) {
+    const satoshiAmount = amount === '0' ? 0 : new SatoshiBig(amount, 'satoshi').toBTCString();
+    return `${satoshiAmount} ${this.environmentContext.getBtcTicker()}`;
   }
 
   get opReturnData(): string {
