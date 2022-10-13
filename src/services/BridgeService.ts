@@ -14,6 +14,7 @@ export class BridgeService {
   }
 
   public getFederationAddress(): Promise<string> {
+    Vue.$log.debug('log from function outside component.');
     return new Promise<string>((resolve, reject) => {
       this.bridgeContract.methods
         .getFederationAddress()

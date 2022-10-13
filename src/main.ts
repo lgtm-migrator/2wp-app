@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Web3 from 'web3';
 import { AppNetwork } from '@/types';
+import VueLogger from 'vuejs-logger';
 import * as constants from './store/constants';
 import App from './App.vue';
 import router from './router';
@@ -11,6 +12,20 @@ import { EnvironmentAccessorService } from './services/enviroment-accessor.servi
 
 Vue.config.productionTip = false;
 Vue.prototype.$web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545');
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+const options = {
+  isEnabled: true,
+  logLevel: isProduction ? 'error' : 'debug',
+  stringifyArguments: false,
+  showLogLevel: true,
+  showMethodName: true,
+  separator: '|',
+  showConsoleColors: true,
+};
+
+Vue.use(VueLogger as any, options);
 
 if (window.ethereum) {
   window.ethereum.on('accountsChanged', async () => {
