@@ -44,6 +44,7 @@ export default class MockedWallet extends WalletService {
     return this.testCase.walletMaxCall;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   sign(tx: Tx): Promise<TrezorSignedTx | LedgerSignedTx> {
     return new Promise<TrezorSignedTx | LedgerSignedTx>((resolve, reject) => {
       if (this.testCase.signedTx instanceof Error) {
@@ -52,5 +53,15 @@ export default class MockedWallet extends WalletService {
         resolve(this.testCase.signedTx);
       }
     });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  isConnected(): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  reconnect(): Promise<void> {
+    return Promise.resolve();
   }
 }

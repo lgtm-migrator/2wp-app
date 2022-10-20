@@ -8,6 +8,7 @@ import * as constants from '@/store/constants';
 import { EnvironmentAccessorService } from '@/services/enviroment-accessor.service';
 
 const localVue = createLocalVue();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let vuetify:any;
 
 describe('TxSummary', () => {

@@ -39,7 +39,7 @@ export default abstract class TxBuilder {
       amountToTransferInSatoshi, refundAddress, recipient,
       sessionId, feeLevel, changeAddress,
     );
-    const walletAddresses: WalletAddress[] = store.state.pegInTx.addressList as WalletAddress[];
+    const walletAddresses: WalletAddress[] = store.state.pegInTx?.addressList as WalletAddress[];
     const hasChange: boolean = normalizedTx.outputs[2] !== undefined;
     const changeAddr = hasChange && normalizedTx.outputs[2].address
       ? normalizedTx.outputs[2].address : changeAddress;

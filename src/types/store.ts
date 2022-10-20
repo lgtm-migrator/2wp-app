@@ -1,7 +1,8 @@
 import { PegStatus } from '@/store/constants';
+import { PegInTxState } from '@/types/pegInTx';
 
 export interface RootState {
-  [x: string]: any;
+  pegInTx?: PegInTxState
   version: string;
 }
 
@@ -28,6 +29,7 @@ export interface PeginStatus {
   status: PegStatus;
 }
 
+// eslint-disable-next-line no-shadow
 export enum PegoutStatus {
   RECEIVED = 'RECEIVED',
   REJECTED = 'REJECTED',
@@ -50,6 +52,7 @@ export interface PegoutStatusDataModel {
   btcRawTransaction: string;
 }
 
+// eslint-disable-next-line no-shadow
 export enum TxStatusType {
   PEGIN = 'PEGIN',
   PEGOUT = 'PEGOUT',

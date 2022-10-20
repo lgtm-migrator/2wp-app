@@ -59,7 +59,7 @@
 import {
   Component, Emit, Vue,
 } from 'vue-property-decorator';
-import { Getter, State, Action } from 'vuex-class';
+import { Getter, State } from 'vuex-class';
 import PegInAccountSelect from '@/components/create/PegInAccountSelect.vue';
 import BtcInputAmount from '@/components/create/BtcInputAmount.vue';
 import RskAddressInput from '@/components/create/RskAddressInput.vue';
@@ -94,8 +94,6 @@ export default class PegInForm extends Vue {
   @State('pegInTx') pegInTxState!: PegInTxState;
 
   @Getter(constants.PEGIN_TX_GET_REFUND_ADDRESS, { namespace: 'pegInTx' }) refundAddress!: string;
-
-  @Action(constants.WEB3_SESSION_CLEAR_ACCOUNT, { namespace: 'web3Session' }) clearAccount !: any;
 
   backHome() {
     this.pegInFormState.send('goingHome');

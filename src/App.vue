@@ -26,7 +26,7 @@ import { EnvironmentAccessorService } from '@/services/enviroment-accessor.servi
   },
 })
 export default class App extends Vue {
-  scriptTag?: any;
+  scriptTag?: HTMLScriptElement;
 
   mounted() {
     const hotjarID = EnvironmentAccessorService.getEnvironmentVariables().vueAppHotjarId;
