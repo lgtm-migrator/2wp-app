@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import sinon from 'sinon';
 import { EnvironmentAccessorService } from '@/services/enviroment-accessor.service';
 import * as constants from '@/store/constants';
@@ -30,8 +29,8 @@ describe('Liquality Service:', () => {
   beforeEach(initEnvironment);
   it('should create a LiqualityService instance', () => {
     const liqualityService = new LiqualityService();
-    expect(liqualityService).to.be.instanceOf(LiqualityService);
-    expect(liqualityService).to.be.instanceOf(WalletService);
+    expect(liqualityService).toBeInstanceOf(LiqualityService);
+    expect(liqualityService).toBeInstanceOf(WalletService);
   });
   it('should get the same number of requested addresses', () => {
     mockedBitcoinProvider = sinon.createStubInstance(MockedBtcProvider);
@@ -74,11 +73,11 @@ describe('Liquality Service:', () => {
 
     return liqualityService.getAccountAddresses(batch, startFrom)
       .then((walletAddresses) => {
-        expect(walletAddresses.length).to.be.eql(batch * 2);
+        expect(walletAddresses.length).toEqual(batch * 2);
         // eslint-disable-next-line no-unused-expressions
-        expect(mockedBitcoinProvider.enable.notCalled).to.be.true;
+        expect(mockedBitcoinProvider.enable.notCalled).toBeTruthy();
         // eslint-disable-next-line no-unused-expressions
-        expect(request.calledTwice).to.be.true;
+        expect(request.calledTwice).toBeTruthy();
       });
   });
   it('should return exception when Liquality plugin is not installed', () => {
@@ -116,7 +115,7 @@ describe('Liquality Service:', () => {
     enable.resolves();
     const liqualityService = new LiqualityService(mockedBitcoinProvider);
     return liqualityService.getAccountAddresses(batch, startFrom)
-      .then().catch((e) => expect(e.message).to.be.eql('Liquality software wallet is not installed on your browser'));
+      .then().catch((e) => expect(e.message).toEqual('Liquality software wallet is not installed on your browser'));
   });
   it('should return a wallet signed tx', () => {
     mockedBitcoinProvider = sinon.createStubInstance(MockedBtcProvider);
@@ -141,6 +140,6 @@ describe('Liquality Service:', () => {
       coin: constants.BTC_NETWORK_TESTNET,
       base64UnsignedPsbt: mockedData.unsignedPsbtTx,
     })
-      .then((signedTx) => expect(signedTx.signedTx).to.be.eql(mockedData.signedTx));
+      .then((signedTx) => expect(signedTx.signedTx).toEqual(mockedData.signedTx));
   });
 });
